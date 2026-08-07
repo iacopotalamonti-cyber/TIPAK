@@ -11,30 +11,6 @@
    ══════════════════════════════════════════════════════════════ */
 
 
-/* ── Supabase (invariato) ──────────────────────────────────────── */
-const supabaseUrl = 'https://tpjqblsrdcnqlxqdztql.supabase.co';
-const supabaseKey = 'sb_publishable_o61X1d-esqvG4jW5qKPYyA_gM6QRH3o';
-const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
-
-/* Salva il profilo nel database Tipak (bug fix: supabase → supabaseClient) */
-async function salvaCandidato(datiUtente) {
-    const { data, error } = await supabaseClient
-        .from('candidati')
-        .upsert([{
-            email: datiUtente.email,
-            nome: datiUtente.nome,
-            cognome: datiUtente.cognome,
-            dati_cv: datiUtente
-        }]);
-
-    if (error) {
-        console.error('Errore database:', error);
-    } else {
-        console.log('Profilo salvato su Tipak:', data);
-    }
-}
-
-
 /* ── Costanti ─────────────────────────────────────────────────── */
 const LIVELLI_QCER = [
     'Madrelingua',
@@ -52,9 +28,46 @@ let forCount  = 0;
 let linCount  = 0;
 let certCount = 0;
 
-/* Shorthand */
+/* Shorthand — dichiarati prima di tutto: il resto dell'app (form,
+   anteprima, export PDF) non deve mai dipendere dal caricamento di
+   Supabase per funzionare. */
 const g = id => document.getElementById(id);
 const esc = s => (s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+
+/* ── Supabase ─────────────────────────────────────────────────────
+   Se lo script esterno di Supabase non si carica (rete, ad-blocker,
+   CDN irraggiungibile) supabaseClient resta null: salvaCandidato()
+   fallisce in silenzio invece di bloccare il resto dello script. */
+const supabaseUrl = 'https://tpjqblsrdcnqlxqdztql.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRwanFibHNyZGNucWx4cWR6dHFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3MjkyOTksImV4cCI6MjA5NjMwNTI5OX0.Fso3AZHVaWgjLWp7Pq5CKLx9nkvoGlFVBCj4r1N3gr8';
+let supabaseClient = null;
+try {
+    supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+} catch (err) {
+    console.error('Supabase non disponibile, il salvataggio del profilo sarà disattivato:', err);
+}
+
+/* Salva il profilo nel database Tipak.
+   Lancia un errore se il salvataggio fallisce (Supabase non
+   disponibile, RLS che blocca la scrittura, ecc.) — chi chiama
+   questa funzione deve sapere se ha davvero funzionato, non deve
+   mai dare per scontato il successo. */
+async function salvaCandidato(datiUtente) {
+    if (!supabaseClient) throw new Error('Supabase non disponibile');
+
+    const { data, error } = await supabaseClient
+        .from('candidati')
+        .upsert([{
+            email: datiUtente.email,
+            nome: datiUtente.nome,
+            cognome: datiUtente.cognome,
+            dati_cv: datiUtente
+        }]);
+
+    if (error) throw error;
+    console.log('Profilo salvato su Tipak:', data);
+}
 
 
 /* ══════════════════════════════════════════════════════════════
@@ -496,62 +509,70 @@ function calcolaATS(nome, cognome, titolo, email, tel, bio, hasEsp, hasFor, tags
 
 
 /* ══════════════════════════════════════════════════════════════
+   RACCOLTA DATI FORM — usata sia per l'autosave che per il
+   salvataggio del profilo su Supabase
+   ══════════════════════════════════════════════════════════════ */
+function raccogliDatiForm() {
+    const data = {
+        nome:      g('input-nome')?.value      || '',
+        cognome:   g('input-cognome')?.value   || '',
+        titolo:    g('input-titolo')?.value     || '',
+        email:     g('input-email')?.value     || '',
+        tel:       g('input-tel')?.value       || '',
+        citta:     g('input-citta')?.value     || '',
+        linkedin:  g('input-linkedin')?.value  || '',
+        bio:       g('input-bio')?.value       || '',
+        skills:    g('input-skills')?.value    || '',
+        esperienze: [],
+        formazione: [],
+        lingue: [],
+        certificazioni: []
+    };
+
+    document.querySelectorAll('.exp-input-box').forEach(box => {
+        data.esperienze.push({
+            ruolo:   box.querySelector('.in-ruolo')?.value   || '',
+            azienda: box.querySelector('.in-azienda')?.value || '',
+            date:    box.querySelector('.in-date')?.value    || '',
+            desc:    box.querySelector('.in-desc')?.value    || ''
+        });
+    });
+
+    document.querySelectorAll('.for-input-box').forEach(box => {
+        data.formazione.push({
+            titolo:   box.querySelector('.in-for-titolo')?.value   || '',
+            istituto: box.querySelector('.in-for-istituto')?.value || '',
+            da:       box.querySelector('.in-for-da')?.value       || '',
+            a:        box.querySelector('.in-for-a')?.value        || '',
+            voto:     box.querySelector('.in-for-voto')?.value     || ''
+        });
+    });
+
+    document.querySelectorAll('.lin-input-box').forEach(box => {
+        data.lingue.push({
+            lingua:  box.querySelector('.in-lingua')?.value  || '',
+            livello: box.querySelector('.in-livello')?.value || ''
+        });
+    });
+
+    document.querySelectorAll('.cert-input-box').forEach(box => {
+        data.certificazioni.push({
+            nome:  box.querySelector('.in-cert-nome')?.value || '',
+            ente:  box.querySelector('.in-cert-ente')?.value || '',
+            anno:  box.querySelector('.in-cert-anno')?.value || ''
+        });
+    });
+
+    return data;
+}
+
+
+/* ══════════════════════════════════════════════════════════════
    SALVATAGGIO AUTOMATICO (localStorage)
    ══════════════════════════════════════════════════════════════ */
 function salvaLavoroAutomatico() {
     try {
-        const data = {
-            nome:      g('input-nome')?.value      || '',
-            cognome:   g('input-cognome')?.value   || '',
-            titolo:    g('input-titolo')?.value     || '',
-            email:     g('input-email')?.value     || '',
-            tel:       g('input-tel')?.value       || '',
-            citta:     g('input-citta')?.value     || '',
-            linkedin:  g('input-linkedin')?.value  || '',
-            bio:       g('input-bio')?.value       || '',
-            skills:    g('input-skills')?.value    || '',
-            esperienze: [],
-            formazione: [],
-            lingue: [],
-            certificazioni: []
-        };
-
-        document.querySelectorAll('.exp-input-box').forEach(box => {
-            data.esperienze.push({
-                ruolo:   box.querySelector('.in-ruolo')?.value   || '',
-                azienda: box.querySelector('.in-azienda')?.value || '',
-                date:    box.querySelector('.in-date')?.value    || '',
-                desc:    box.querySelector('.in-desc')?.value    || ''
-            });
-        });
-
-        document.querySelectorAll('.for-input-box').forEach(box => {
-            data.formazione.push({
-                titolo:   box.querySelector('.in-for-titolo')?.value   || '',
-                istituto: box.querySelector('.in-for-istituto')?.value || '',
-                da:       box.querySelector('.in-for-da')?.value       || '',
-                a:        box.querySelector('.in-for-a')?.value        || '',
-                voto:     box.querySelector('.in-for-voto')?.value     || ''
-            });
-        });
-
-        document.querySelectorAll('.lin-input-box').forEach(box => {
-            data.lingue.push({
-                lingua:  box.querySelector('.in-lingua')?.value  || '',
-                livello: box.querySelector('.in-livello')?.value || ''
-            });
-        });
-
-        document.querySelectorAll('.cert-input-box').forEach(box => {
-            data.certificazioni.push({
-                nome:  box.querySelector('.in-cert-nome')?.value || '',
-                ente:  box.querySelector('.in-cert-ente')?.value || '',
-                anno:  box.querySelector('.in-cert-anno')?.value || ''
-            });
-        });
-
-        localStorage.setItem('cv_builder_autosave', JSON.stringify(data));
-
+        localStorage.setItem('cv_builder_autosave', JSON.stringify(raccogliDatiForm()));
     } catch (e) {
         console.error('Errore salvataggio localStorage:', e);
     }
@@ -563,25 +584,25 @@ function salvaLavoroAutomatico() {
    Testo vero, colonna singola, leggibile da Taleo / SuccessFactors
    ══════════════════════════════════════════════════════════════ */
 function buildCVHTML() {
-    const nome     = (`${g('input-nome')?.value || ''} ${g('input-cognome')?.value || ''}`).trim() || 'Nome Cognome';
-    const titolo   = g('input-titolo')?.value   || '';
-    const email    = g('input-email')?.value    || '';
-    const tel      = g('input-tel')?.value      || '';
-    const citta    = g('input-citta')?.value    || '';
-    const linkedin = g('input-linkedin')?.value || '';
-    const bio      = g('input-bio')?.value      || '';
+    const nome     = esc((`${g('input-nome')?.value || ''} ${g('input-cognome')?.value || ''}`).trim()) || 'Nome Cognome';
+    const titolo   = esc(g('input-titolo')?.value   || '');
+    const email    = esc(g('input-email')?.value    || '');
+    const tel      = esc(g('input-tel')?.value      || '');
+    const citta    = esc(g('input-citta')?.value    || '');
+    const linkedin = esc(g('input-linkedin')?.value || '');
+    const bio      = esc(g('input-bio')?.value      || '');
     const skills   = g('input-skills')?.value   || '';
 
     const contacts = [email, tel, citta, linkedin].filter(Boolean).join(' &nbsp;·&nbsp; ');
-    const tags     = skills ? skills.split(',').map(s => s.trim()).filter(Boolean) : [];
+    const tags     = skills ? skills.split(',').map(s => esc(s.trim())).filter(Boolean) : [];
 
     /* Esperienze */
     let espHTML = '';
     document.querySelectorAll('.exp-input-box').forEach(box => {
-        const ruolo   = box.querySelector('.in-ruolo')?.value   || '';
-        const azienda = box.querySelector('.in-azienda')?.value || '';
-        const date    = box.querySelector('.in-date')?.value    || '';
-        const desc    = box.querySelector('.in-desc')?.value    || '';
+        const ruolo   = esc(box.querySelector('.in-ruolo')?.value   || '');
+        const azienda = esc(box.querySelector('.in-azienda')?.value || '');
+        const date    = esc(box.querySelector('.in-date')?.value    || '');
+        const desc    = esc(box.querySelector('.in-desc')?.value    || '');
         if (!ruolo && !azienda && !desc) return;
         espHTML += `
         <div class="item">
@@ -596,11 +617,11 @@ function buildCVHTML() {
     /* Formazione */
     let forHTML = '';
     document.querySelectorAll('.for-input-box').forEach(box => {
-        const titolo_s  = box.querySelector('.in-for-titolo')?.value   || '';
-        const istituto  = box.querySelector('.in-for-istituto')?.value || '';
-        const da        = box.querySelector('.in-for-da')?.value       || '';
-        const a_        = box.querySelector('.in-for-a')?.value        || '';
-        const voto      = box.querySelector('.in-for-voto')?.value     || '';
+        const titolo_s  = esc(box.querySelector('.in-for-titolo')?.value   || '');
+        const istituto  = esc(box.querySelector('.in-for-istituto')?.value || '');
+        const da        = esc(box.querySelector('.in-for-da')?.value       || '');
+        const a_        = esc(box.querySelector('.in-for-a')?.value        || '');
+        const voto      = esc(box.querySelector('.in-for-voto')?.value     || '');
         if (!titolo_s && !istituto) return;
         const dr = [da, a_].filter(Boolean).join(' – ');
         forHTML += `
@@ -615,8 +636,8 @@ function buildCVHTML() {
     /* Lingue */
     let linHTML = '';
     document.querySelectorAll('.lin-input-box').forEach(box => {
-        const lingua  = box.querySelector('.in-lingua')?.value  || '';
-        const livello = box.querySelector('.in-livello')?.value || '';
+        const lingua  = esc(box.querySelector('.in-lingua')?.value  || '');
+        const livello = esc(box.querySelector('.in-livello')?.value || '');
         if (!lingua) return;
         linHTML += `<span class="lp"><b>${lingua}</b> <span class="m">${livello}</span></span>`;
     });
@@ -624,9 +645,9 @@ function buildCVHTML() {
     /* Certificazioni */
     let certHTML = '';
     document.querySelectorAll('.cert-input-box').forEach(box => {
-        const nome_c = box.querySelector('.in-cert-nome')?.value || '';
-        const ente   = box.querySelector('.in-cert-ente')?.value || '';
-        const anno   = box.querySelector('.in-cert-anno')?.value || '';
+        const nome_c = esc(box.querySelector('.in-cert-nome')?.value || '');
+        const ente   = esc(box.querySelector('.in-cert-ente')?.value || '');
+        const anno   = esc(box.querySelector('.in-cert-anno')?.value || '');
         if (!nome_c) return;
         certHTML += `<div class="item" style="margin-bottom:5px"><b>${nome_c}</b>${ente ? ` &nbsp;·&nbsp; <span class="m">${ente}</span>` : ''}${anno ? ` <span class="d">(${anno})</span>` : ''}</div>`;
     });
@@ -651,8 +672,8 @@ h1{font-size:28px;font-weight:700;color:#1a202c;letter-spacing:-0.3px;margin-bot
 .jt{font-size:14px;font-weight:600;color:#ff6a00;margin-bottom:10px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 .ct{font-size:11px;color:#4a5568;line-height:1.7}
 .s{margin-bottom:20px}
-h2{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#ff6a00;border-bottom:1px solid #fed7aa;padding-bottom:5px;margin-bottom:12px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-.item{margin-bottom:12px}.item:last-child{margin-bottom:0}
+h2{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#ff6a00;border-bottom:1px solid #fed7aa;padding-bottom:5px;margin-bottom:12px;-webkit-print-color-adjust:exact;print-color-adjust:exact;break-after:avoid;page-break-after:avoid}
+.item{margin-bottom:12px;break-inside:avoid;page-break-inside:avoid}.item:last-child{margin-bottom:0}
 .row{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
 .main{flex:1;font-size:12px;color:#1a202c}.m{color:#4a5568;font-weight:400}
 .d{font-size:10.5px;color:#718096;white-space:nowrap;flex-shrink:0}
@@ -662,10 +683,14 @@ h2{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:2px;c
 .tag{font-size:11px;color:#2d3748;background:#f7fafc;border:1px solid #e2e8f0;border-radius:3px;padding:2px 9px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 .lg{line-height:2.2;font-size:12px}.lp{margin-right:8px}
 .prv{margin-top:28px;padding-top:12px;border-top:1px solid #edf2f7;font-size:8.5px;color:#a0aec0;line-height:1.45}
-@media print{body{padding:0;max-width:100%}@page{size:A4;margin:1.5cm 2cm}}
+.credit{margin-top:10px;font-size:8px;color:#cbd5e0;text-align:center}
+.print-hint{position:sticky;top:0;background:#fff7ed;border-bottom:1px solid #fed7aa;color:#9a3412;font-size:12.5px;font-weight:600;text-align:center;padding:12px 16px;margin:-52px -60px 24px}
+.print-hint button{margin-left:10px;background:#ff6a00;color:#fff;border:none;padding:6px 14px;border-radius:6px;font-weight:700;font-size:12px;cursor:pointer;font-family:inherit}
+@media print{.print-hint{display:none}body{padding:0;max-width:100%}@page{size:A4;margin:1.5cm 2cm}}
 </style>
 </head>
 <body>
+<div class="print-hint">Il tuo CV è pronto. Si sta aprendo la finestra di stampa — scegli "Salva come PDF" come destinazione. Prima di salvare, apri "Altre impostazioni" e <strong>disattiva "Intestazioni e piè di pagina"</strong> per un PDF pulito, senza data e indirizzo. <button onclick="window.print()">Stampa / Salva PDF</button></div>
 <header>
     <h1>${nome}</h1>
     ${titolo ? `<div class="jt">${titolo}</div>` : ''}
@@ -678,14 +703,36 @@ ${sec('Competenze', tags.length ? `<div class="tags">${tags.map(t => `<span clas
 ${sec('Lingue', linHTML ? `<div class="lg">${linHTML}</div>` : '')}
 ${sec('Certificazioni', certHTML)}
 <div class="prv">Autorizzo il trattamento dei miei dati personali ai sensi dell'art. 13 D.Lgs. 196/2003 come modificato dal D.Lgs. 101/2018, e dell'art. 13 del Regolamento UE 679/2016 (GDPR).</div>
+<div class="credit">Creato con Tipak — tipak.me</div>
+<script>window.addEventListener('load', () => setTimeout(() => window.print(), 300));</script>
 </body>
 </html>`;
 }
 
 
 /* ══════════════════════════════════════════════════════════════
+   TOAST — conferma visiva in fondo alla pagina
+   ══════════════════════════════════════════════════════════════ */
+let toastTimer = null;
+function mostraToast(msg, tipo = 'ok') {
+    let toast = g('toast');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'toast';
+        document.body.appendChild(toast);
+    }
+    const icona = tipo === 'error' ? 'fa-circle-exclamation' : 'fa-circle-check';
+    toast.className = 'toast show' + (tipo === 'error' ? ' toast-error' : '');
+    toast.innerHTML = `<i class="fa-solid ${icona}"></i><span>${esc(msg)}</span>`;
+
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 4000);
+}
+
+
+/* ══════════════════════════════════════════════════════════════
    GENERA PDF — blob URL + window.print()
-   
+
    Il PDF generato con questo metodo ha TESTO VERO, non un'immagine.
    È selezionabile, copiabile, e leggibile da Taleo, SuccessFactors
    e qualsiasi altro ATS. La vecchia funzione html2pdf() generava
@@ -696,10 +743,24 @@ function generaPDF() {
     const blob  = new Blob([html], { type: 'text/html;charset=utf-8' });
     const url   = URL.createObjectURL(blob);
 
+    /* Salva il profilo su Tipak in parallelo — non deve mai bloccare
+       né ritardare il download del PDF, anche se fallisce. */
+    const datiForm = raccogliDatiForm();
+    if (datiForm.email) {
+        salvaCandidato(datiForm)
+            .then(() => mostraToast('Profilo salvato su Tipak ✓'))
+            .catch(err => {
+                console.error('Errore salvataggio profilo:', err);
+                mostraToast('CV scaricato, ma il profilo non è stato salvato su Tipak.', 'error');
+            });
+    }
+
     /* Prova ad aprire in una nuova scheda per la stampa */
     const win = window.open(url, '_blank');
 
-    if (!win) {
+    if (win) {
+        mostraToast('CV generato! Nella nuova scheda scegli "Salva come PDF".');
+    } else {
         /* Popup bloccato: fallback — scarica direttamente il file HTML */
         const nome    = g('input-nome')?.value    || 'Curriculab';
         const cognome = g('input-cognome')?.value || '';
@@ -709,7 +770,7 @@ function generaPDF() {
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
-        alert('Popup bloccato dal browser.\nIl file HTML è stato scaricato: aprilo nel browser e usa Ctrl+P → Salva come PDF.');
+        mostraToast('Popup bloccato dal browser: il file è stato scaricato. Aprilo e usa Ctrl+P → "Salva come PDF".', 'error');
     }
 
     /* Libera memoria dopo 60 secondi */

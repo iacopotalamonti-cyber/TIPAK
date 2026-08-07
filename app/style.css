@@ -1,6 +1,6 @@
 /* ══════════════════════════════════════════════════════════════
    CURRICULAB — style.css
-   Design: dark form panel (Tipak palette) + white A4 preview
+   Design: form panel chiaro (Tipak palette, tema light) + A4 preview
    ══════════════════════════════════════════════════════════════ */
 
 /* ── Reset & Tokens ── */
@@ -11,17 +11,17 @@
 }
 
 :root {
-    --bg:      #050505;
-    --bg2:     #0c0c0c;
-    --card:    #111111;
-    --b:       #1e1e1e;
-    --b2:      #2a2a2a;
-    --pri:     #f8fafc;
-    --mut:     #94a3b8;
+    --bg:      #ffffff;
+    --bg2:     #f6f7f9;
+    --card:    #ffffff;
+    --b:       #e5e7eb;
+    --b2:      #d7dbe0;
+    --pri:     #12151a;
+    --mut:     #6b7280;
     --acc:     #ff6a00;
-    --acc-a:   rgba(255, 106, 0, 0.12);
-    --acc-b:   rgba(255, 106, 0, 0.28);
-    --red:     #e11d48;
+    --acc-a:   rgba(255, 106, 0, 0.10);
+    --acc-b:   rgba(255, 106, 0, 0.32);
+    --red:     #dc2626;
     --green:   #16a34a;
 }
 
@@ -29,7 +29,7 @@ html, body {
     height: 100%;
     overflow: hidden;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    font-size: 13px;
+    font-size: 14px;
     color: var(--pri);
     background: var(--bg);
 }
@@ -57,16 +57,33 @@ html, body {
 }
 
 .header-brand .logo {
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 700;
     letter-spacing: 3px;
     color: var(--acc);
     line-height: 1;
 }
 .header-brand .logo-sub {
-    font-size: 9px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 10px;
     color: var(--mut);
-    margin-top: 2px;
+    margin-top: 3px;
+}
+
+.logo-sub-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--mut);
+    text-decoration: none;
+    transition: color 0.15s;
+    font-weight: 600;
+}
+
+.logo-sub-link:hover {
+    color: var(--acc);
 }
 
 .ats-badge {
@@ -137,30 +154,30 @@ html, body {
 /* Section labels */
 .sec-label {
     display: block;
-    font-size: 9px;
+    font-size: 10.5px;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 2px;
     color: var(--acc);
-    padding: 16px 0 8px;
+    padding: 18px 0 9px;
     border-bottom: 1px solid var(--b);
-    margin-bottom: 12px;
+    margin-bottom: 14px;
 }
 .sec-label-opt {
     font-weight: 400;
     text-transform: none;
     letter-spacing: 0;
     color: var(--mut);
-    font-size: 9px;
+    font-size: 10px;
 }
 
 /* Fields */
-.field { margin-bottom: 10px; }
+.field { margin-bottom: 12px; }
 .lbl {
     display: block;
-    font-size: 10.5px;
+    font-size: 12px;
     color: var(--mut);
-    margin-bottom: 3px;
+    margin-bottom: 4px;
     font-weight: 500;
 }
 
@@ -171,47 +188,50 @@ select {
     width: 100%;
     background: var(--card);
     border: 1px solid var(--b2);
-    border-radius: 6px;
+    border-radius: 8px;
     color: var(--pri);
-    font-size: 12px;
-    padding: 7px 10px;
+    font-size: 13.5px;
+    padding: 9px 12px;
     outline: none;
     font-family: inherit;
-    transition: border-color 0.15s;
+    transition: border-color 0.15s, box-shadow 0.15s;
 }
 input[type=text]:focus,
 input[type=email]:focus,
 textarea:focus,
-select:focus { border-color: var(--acc); }
-textarea { resize: vertical; line-height: 1.5; min-height: 66px; }
+select:focus {
+    border-color: var(--acc);
+    box-shadow: 0 0 0 3px var(--acc-a);
+}
+textarea { resize: vertical; line-height: 1.55; min-height: 70px; }
 select { cursor: pointer; }
 
 /* Grids */
-.row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+.row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
 
 /* Tip text */
 .tip {
-    font-size: 10px;
+    font-size: 11px;
     color: var(--mut);
-    margin-top: 4px;
-    line-height: 1.45;
+    margin-top: 5px;
+    line-height: 1.5;
 }
 
 /* Dynamic section cards */
 .dyn-card {
     background: var(--bg2);
-    border: 1px solid var(--b2);
-    border-radius: 8px;
-    padding: 12px;
-    margin-bottom: 10px;
+    border: 1px solid var(--b);
+    border-radius: 10px;
+    padding: 14px;
+    margin-bottom: 12px;
     position: relative;
 }
 .dyn-num {
-    font-size: 9px;
+    font-size: 10px;
     font-weight: 600;
     color: var(--mut);
-    margin-bottom: 9px;
+    margin-bottom: 10px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
@@ -242,18 +262,18 @@ select { cursor: pointer; }
     gap: 6px;
     width: 100%;
     background: var(--acc-a);
-    border: 1px dashed var(--acc-b);
+    border: 1px solid var(--acc-b);
     color: var(--acc);
-    border-radius: 6px;
-    padding: 7px 12px;
-    font-size: 11.5px;
+    border-radius: 8px;
+    padding: 9px 12px;
+    font-size: 12.5px;
     font-weight: 600;
     cursor: pointer;
     font-family: inherit;
     margin-bottom: 4px;
     transition: background 0.15s;
 }
-.add-btn:hover { background: rgba(255,106,0,0.2); }
+.add-btn:hover { background: rgba(255,106,0,0.16); }
 
 /* Checkbox row */
 .chk-row {
@@ -294,11 +314,11 @@ input[type=checkbox] {
 }
 .dl-btn:hover { opacity: 0.88; }
 .dl-note {
-    font-size: 9.5px;
+    font-size: 10.5px;
     color: var(--mut);
     text-align: center;
-    margin-top: 5px;
-    line-height: 1.4;
+    margin-top: 6px;
+    line-height: 1.45;
 }
 
 
@@ -309,7 +329,7 @@ input[type=checkbox] {
     flex: 1;
     height: 100%;
     overflow-y: auto;
-    background: #d1d5db;
+    background: #eef0f3;
     padding: 18px 16px 40px;
     display: flex;
     flex-direction: column;
@@ -500,6 +520,54 @@ input[type=checkbox] {
 
 
 /* ══════════════════════════════════════════════════════════════
+   RESPONSIVE — sotto 768px il layout affiancato diventa impilato
+   (form sopra, anteprima sotto), altrimenti l'app è inutilizzabile
+   su telefono/tablet.
+   ══════════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+    html, body { overflow: auto; }
+
+    .app-header {
+        height: auto;
+        padding: 12px 16px;
+        flex-wrap: wrap;
+        gap: 10px;
+        row-gap: 8px;
+    }
+    .header-brand { order: 1; }
+    .ats-badge { order: 3; margin-left: auto; }
+    #btn-pdf {
+        order: 2;
+        padding: 7px 12px;
+        font-size: 12px;
+    }
+
+    .split-container {
+        flex-direction: column;
+        height: auto;
+        overflow: visible;
+    }
+
+    .form-half,
+    .preview-half {
+        width: 100%;
+        height: auto;
+        overflow: visible;
+    }
+
+    .form-half { border-right: none; border-bottom: 1px solid var(--b); }
+
+    .form-scroll { overflow-y: visible; }
+
+    .row-2, .row-3 { grid-template-columns: 1fr; }
+
+    .preview-half { padding: 20px 14px 44px; }
+
+    .a4-page { padding: 30px 26px; }
+}
+
+
+/* ══════════════════════════════════════════════════════════════
    STAMPA / MEDIA PRINT
    Nasconde l'interfaccia e mostra solo il CV per la stampa nativa.
    Nota: generaPDF() usa blob + window.print() — questo CSS
@@ -552,3 +620,35 @@ input[type=checkbox] {
         print-color-adjust: exact;
     }
 }
+
+
+/* ══════════════════════════════════════════════════════════════
+   TOAST — conferma visiva dopo un'azione (es. generazione CV)
+   ══════════════════════════════════════════════════════════════ */
+.toast {
+    position: fixed;
+    left: 50%;
+    bottom: 24px;
+    transform: translateX(-50%) translateY(20px);
+    background: #12151a;
+    color: #fff;
+    padding: 13px 20px;
+    border-radius: 10px;
+    font-size: 13.5px;
+    font-weight: 600;
+    box-shadow: 0 8px 28px rgba(0,0,0,0.25);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    max-width: min(90vw, 420px);
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+}
+.toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+.toast i { color: var(--green); flex-shrink: 0; }
+.toast.toast-error i { color: var(--red); }
