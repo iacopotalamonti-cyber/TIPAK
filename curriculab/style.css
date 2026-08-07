@@ -1,0 +1,654 @@
+/* ══════════════════════════════════════════════════════════════
+   CURRICULAB — style.css
+   Design: form panel chiaro (Tipak palette, tema light) + A4 preview
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── Reset & Tokens ── */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --bg:      #ffffff;
+    --bg2:     #f6f7f9;
+    --card:    #ffffff;
+    --b:       #e5e7eb;
+    --b2:      #d7dbe0;
+    --pri:     #12151a;
+    --mut:     #6b7280;
+    --acc:     #ff6a00;
+    --acc-a:   rgba(255, 106, 0, 0.10);
+    --acc-b:   rgba(255, 106, 0, 0.32);
+    --red:     #dc2626;
+    --green:   #16a34a;
+}
+
+html, body {
+    height: 100%;
+    overflow: hidden;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 14px;
+    color: var(--pri);
+    background: var(--bg);
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--b2); border-radius: 10px; }
+
+
+/* ══════════════════════════════════════════════════════════════
+   HEADER
+   ══════════════════════════════════════════════════════════════ */
+.app-header {
+    background: var(--bg);
+    border-bottom: 1px solid var(--b);
+    padding: 0 20px;
+    height: 54px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 100;
+}
+
+.header-brand .logo {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: var(--acc);
+    line-height: 1;
+}
+.header-brand .logo-sub {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 10px;
+    color: var(--mut);
+    margin-top: 3px;
+}
+
+.logo-sub-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--mut);
+    text-decoration: none;
+    transition: color 0.15s;
+    font-weight: 600;
+}
+
+.logo-sub-link:hover {
+    color: var(--acc);
+}
+
+.ats-badge {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1px;
+}
+.ats-badge-label {
+    font-size: 9px;
+    color: var(--mut);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+#ats-score {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--red);
+    transition: color 0.3s;
+    line-height: 1;
+}
+
+#btn-pdf {
+    background: var(--acc);
+    color: #fff;
+    border: none;
+    padding: 9px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.3px;
+    font-family: inherit;
+    transition: opacity 0.15s;
+}
+#btn-pdf:hover { opacity: 0.85; }
+
+
+/* ══════════════════════════════════════════════════════════════
+   SPLIT LAYOUT
+   ══════════════════════════════════════════════════════════════ */
+.split-container {
+    display: flex;
+    height: calc(100vh - 54px);
+    overflow: hidden;
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   FORM PANEL (LEFT)
+   ══════════════════════════════════════════════════════════════ */
+.form-half {
+    width: 44%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg);
+    border-right: 1px solid var(--b);
+    overflow: hidden;
+}
+
+.form-scroll {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 18px 16px;
+}
+
+/* Section labels */
+.sec-label {
+    display: block;
+    font-size: 10.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--acc);
+    padding: 18px 0 9px;
+    border-bottom: 1px solid var(--b);
+    margin-bottom: 14px;
+}
+.sec-label-opt {
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: 0;
+    color: var(--mut);
+    font-size: 10px;
+}
+
+/* Fields */
+.field { margin-bottom: 12px; }
+.lbl {
+    display: block;
+    font-size: 12px;
+    color: var(--mut);
+    margin-bottom: 4px;
+    font-weight: 500;
+}
+
+input[type=text],
+input[type=email],
+textarea,
+select {
+    width: 100%;
+    background: var(--card);
+    border: 1px solid var(--b2);
+    border-radius: 8px;
+    color: var(--pri);
+    font-size: 13.5px;
+    padding: 9px 12px;
+    outline: none;
+    font-family: inherit;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+input[type=text]:focus,
+input[type=email]:focus,
+textarea:focus,
+select:focus {
+    border-color: var(--acc);
+    box-shadow: 0 0 0 3px var(--acc-a);
+}
+textarea { resize: vertical; line-height: 1.55; min-height: 70px; }
+select { cursor: pointer; }
+
+/* Grids */
+.row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+
+/* Tip text */
+.tip {
+    font-size: 11px;
+    color: var(--mut);
+    margin-top: 5px;
+    line-height: 1.5;
+}
+
+/* Dynamic section cards */
+.dyn-card {
+    background: var(--bg2);
+    border: 1px solid var(--b);
+    border-radius: 10px;
+    padding: 14px;
+    margin-bottom: 12px;
+    position: relative;
+}
+.dyn-num {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--mut);
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Remove button */
+.rm-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: transparent;
+    border: 1px solid var(--b2);
+    color: var(--mut);
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 9px;
+    padding: 2px 7px;
+    font-family: inherit;
+    line-height: 1;
+    transition: border-color 0.15s, color 0.15s;
+}
+.rm-btn:hover { border-color: var(--red); color: var(--red); }
+
+/* Add button */
+.add-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    background: var(--acc-a);
+    border: 1px solid var(--acc-b);
+    color: var(--acc);
+    border-radius: 8px;
+    padding: 9px 12px;
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    margin-bottom: 4px;
+    transition: background 0.15s;
+}
+.add-btn:hover { background: rgba(255,106,0,0.16); }
+
+/* Checkbox row */
+.chk-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--mut);
+    margin: 6px 0;
+    cursor: pointer;
+}
+input[type=checkbox] {
+    width: auto;
+    accent-color: var(--acc);
+    cursor: pointer;
+}
+
+/* Download area */
+.dl-area {
+    padding: 12px 18px 16px;
+    border-top: 1px solid var(--b);
+    background: var(--bg);
+    flex-shrink: 0;
+}
+.dl-btn {
+    width: 100%;
+    padding: 10px 0;
+    background: var(--acc);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.4px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: opacity 0.15s;
+}
+.dl-btn:hover { opacity: 0.88; }
+.dl-note {
+    font-size: 10.5px;
+    color: var(--mut);
+    text-align: center;
+    margin-top: 6px;
+    line-height: 1.45;
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   PREVIEW PANEL (RIGHT)
+   ══════════════════════════════════════════════════════════════ */
+.preview-half {
+    flex: 1;
+    height: 100%;
+    overflow-y: auto;
+    background: #eef0f3;
+    padding: 18px 16px 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.preview-bar {
+    width: 100%;
+    max-width: 640px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    flex-shrink: 0;
+}
+.preview-lbl {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: #374151;
+}
+#ats-checks {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+.ck {
+    font-size: 8.5px;
+    color: #9ca3af;
+    transition: color 0.2s;
+    white-space: nowrap;
+}
+.ck.ok { color: #16a34a; }
+
+
+/* ══════════════════════════════════════════════════════════════
+   A4 SHEET
+   ══════════════════════════════════════════════════════════════ */
+.a4-page {
+    background: #fff;
+    width: 100%;
+    max-width: 640px;
+    min-height: 904px;
+    box-shadow: 0 4px 28px rgba(0,0,0,0.3);
+    border-radius: 1px;
+    padding: 44px 52px;
+    font-family: Calibri, 'Segoe UI', Arial, sans-serif;
+    font-size: 12px;
+    line-height: 1.55;
+    color: #2d3748;
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   CV DOCUMENT STYLES (single column — ATS-safe)
+   ══════════════════════════════════════════════════════════════ */
+
+/* Header */
+.cv-hdr {
+    border-bottom: 2px solid #edf2f7;
+    padding-bottom: 16px;
+    margin-bottom: 20px;
+}
+.cv-name {
+    font-size: 26px;
+    font-weight: 700;
+    color: #1a202c;
+    letter-spacing: -0.3px;
+    margin-bottom: 3px;
+    line-height: 1.1;
+}
+.cv-job-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #ff6a00;
+    margin-bottom: 8px;
+    min-height: 18px;
+}
+.cv-contacts-line {
+    font-size: 11px;
+    color: #4a5568;
+    line-height: 1.7;
+}
+.cv-ph { color: #d1d5db !important; }
+
+/* Sections */
+.cv-section { margin-bottom: 18px; }
+.cv-section-title {
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #ff6a00;
+    border-bottom: 1px solid #fed7aa;
+    padding-bottom: 4px;
+    margin-bottom: 10px;
+}
+
+/* Profilo */
+.cv-profilo-text {
+    font-size: 12px;
+    color: #2d3748;
+    line-height: 1.65;
+    white-space: pre-wrap;
+}
+
+/* Experience */
+.cv-exp-block { margin-bottom: 12px; }
+.cv-exp-block:last-child { margin-bottom: 0; }
+.cv-exp-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8px;
+}
+.cv-exp-role {
+    font-weight: 700;
+    font-size: 12px;
+    color: #1a202c;
+    flex: 1;
+}
+.cv-exp-company {
+    font-size: 11px;
+    color: #4a5568;
+    margin-top: 1px;
+}
+.cv-exp-date {
+    font-size: 10.5px;
+    color: #718096;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+.cv-exp-desc {
+    font-size: 11.5px;
+    color: #4a5568;
+    margin-top: 4px;
+    line-height: 1.55;
+    white-space: pre-wrap;
+}
+
+/* Education */
+.cv-for-block { margin-bottom: 10px; }
+.cv-for-block:last-child { margin-bottom: 0; }
+.cv-for-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8px;
+}
+.cv-for-main { flex: 1; font-size: 12px; color: #1a202c; }
+.cv-for-title { font-weight: 700; }
+.cv-for-meta { color: #4a5568; font-weight: 400; }
+.cv-for-date { font-size: 10.5px; color: #718096; white-space: nowrap; flex-shrink: 0; }
+
+/* Skills */
+.cv-tags-wrap { display: flex; flex-wrap: wrap; gap: 5px; }
+.cv-tag {
+    font-size: 11px;
+    color: #2d3748;
+    background: #f7fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 3px;
+    padding: 2px 8px;
+}
+
+/* Languages */
+.cv-lingue-grid { display: flex; flex-wrap: wrap; gap: 16px; font-size: 12px; }
+.cv-lang-name { font-weight: 700; color: #1a202c; }
+.cv-lang-lvl { color: #718096; font-size: 11px; }
+
+/* Certifications */
+.cv-cert-block { margin-bottom: 6px; font-size: 12px; }
+.cv-cert-block:last-child { margin-bottom: 0; }
+.cv-cert-name { font-weight: 700; color: #1a202c; }
+.cv-cert-meta { color: #4a5568; }
+.cv-cert-anno { color: #718096; font-size: 11px; }
+
+/* Privacy */
+.cv-privacy {
+    margin-top: 24px;
+    padding-top: 11px;
+    border-top: 1px solid #edf2f7;
+    font-size: 8px;
+    color: #a0aec0;
+    line-height: 1.45;
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   RESPONSIVE — sotto 768px il layout affiancato diventa impilato
+   (form sopra, anteprima sotto), altrimenti l'app è inutilizzabile
+   su telefono/tablet.
+   ══════════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+    html, body { overflow: auto; }
+
+    .app-header {
+        height: auto;
+        padding: 12px 16px;
+        flex-wrap: wrap;
+        gap: 10px;
+        row-gap: 8px;
+    }
+    .header-brand { order: 1; }
+    .ats-badge { order: 3; margin-left: auto; }
+    #btn-pdf {
+        order: 2;
+        padding: 7px 12px;
+        font-size: 12px;
+    }
+
+    .split-container {
+        flex-direction: column;
+        height: auto;
+        overflow: visible;
+    }
+
+    .form-half,
+    .preview-half {
+        width: 100%;
+        height: auto;
+        overflow: visible;
+    }
+
+    .form-half { border-right: none; border-bottom: 1px solid var(--b); }
+
+    .form-scroll { overflow-y: visible; }
+
+    .row-2, .row-3 { grid-template-columns: 1fr; }
+
+    .preview-half { padding: 20px 14px 44px; }
+
+    .a4-page { padding: 30px 26px; }
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   STAMPA / MEDIA PRINT
+   Nasconde l'interfaccia e mostra solo il CV per la stampa nativa.
+   Nota: generaPDF() usa blob + window.print() — questo CSS
+   vale SOLO se l'utente stampa direttamente dalla pagina app.
+   ══════════════════════════════════════════════════════════════ */
+@media print {
+    @page {
+        size: A4 portrait;
+        margin: 1.5cm 2cm;
+    }
+
+    body {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        background: white;
+        overflow: visible;
+    }
+
+    .app-header,
+    .form-half,
+    .preview-bar { display: none !important; }
+
+    .split-container,
+    .preview-half {
+        display: block;
+        width: 100%;
+        height: auto;
+        overflow: visible;
+        background: white;
+        padding: 0;
+    }
+
+    .a4-page {
+        width: 100%;
+        max-width: 100%;
+        min-height: auto;
+        box-shadow: none;
+        padding: 0;
+    }
+
+    .cv-section { display: block !important; }
+
+    .cv-exp-block,
+    .cv-for-block { page-break-inside: avoid; break-inside: avoid; }
+
+    .cv-section-title,
+    .cv-job-title,
+    .cv-tag {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   TOAST — conferma visiva dopo un'azione (es. generazione CV)
+   ══════════════════════════════════════════════════════════════ */
+.toast {
+    position: fixed;
+    left: 50%;
+    bottom: 24px;
+    transform: translateX(-50%) translateY(20px);
+    background: #12151a;
+    color: #fff;
+    padding: 13px 20px;
+    border-radius: 10px;
+    font-size: 13.5px;
+    font-weight: 600;
+    box-shadow: 0 8px 28px rgba(0,0,0,0.25);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    max-width: min(90vw, 420px);
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+}
+.toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+.toast i { color: var(--green); flex-shrink: 0; }
+.toast.toast-error i { color: var(--red); }
