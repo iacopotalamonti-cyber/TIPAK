@@ -1,1 +1,224 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tipak — Trova le aziende vicino a te dove lavorare</title>
+    <meta name="description" content="Tipak ti mostra su una mappa tutte le aziende della tua zona dove candidarti, anche quelle senza annunci attivi. Iscriviti alla waitlist.">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
 
+    <header class="nav">
+        <a href="/" class="nav-logo"><svg viewBox="0 0 28 28" width="20" height="20" aria-hidden="true"><path d="M14 1C7.5 1 3 5.8 3 12c0 6 5.5 11.5 11 15 5.5-3.5 11-9 11-15 0-6.2-4.5-11-11-11Z" fill="#ff6a00"/><circle cx="14" cy="12" r="4.3" fill="#fff"/></svg> TIPAK</a>
+        <a href="#waitlist" class="nav-cta">Iscriviti alla waitlist</a>
+    </header>
+
+    <main>
+        <!-- ══ HERO — problema prima, soluzione dopo ══ -->
+        <section class="hero">
+            <span class="eyebrow"><i class="fa-solid fa-location-dot"></i>&nbsp; In arrivo</span>
+            <h1>Hai mai pensato di<br>cambiare lavoro?</h1>
+            <p class="hero-sub">
+                Le aziende vicino a te assumono ogni giorno — ma quasi nessuna pubblica un annuncio.
+                Tipak te le mostra su una mappa: scegli quella giusta e <strong>ti candidi direttamente sul loro sito</strong>.
+            </p>
+
+            <form id="form-waitlist-hero" class="waitlist-form" novalidate>
+                <input type="email" id="email-hero" placeholder="La tua email" required autocomplete="email">
+                <button type="submit"><span>Iscrivimi</span> <i class="fa-solid fa-arrow-right"></i></button>
+            </form>
+            <p class="form-note" id="note-hero">Nessuno spam. Ti scriviamo solo quando l'app è pronta.</p>
+
+            <a href="#demo" class="scroll-hint">Guarda come funziona <i class="fa-solid fa-arrow-down"></i></a>
+        </section>
+
+        <!-- ══ DEMO — MAPPA FINTA ══ -->
+        <section class="section demo" id="demo">
+            <h2>Ecco cosa vedresti aprendo Tipak</h2>
+            <p class="demo-sub">
+                Una mappa con le aziende reali della tua zona. Clicca un pin per vedere i dettagli.
+                <span class="demo-tag">Dati di esempio — l'app vera userà la tua posizione</span>
+            </p>
+
+            <div class="demo-grid">
+                <div class="map-card">
+                    <svg class="map-bg" viewBox="0 0 400 320" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+                        <rect x="0" y="0" width="400" height="320" fill="var(--card)"></rect>
+
+                        <!-- acqua -->
+                        <path d="M0 320 L0 260 Q60 230 130 260 T260 270 L400 300 L400 320 Z" fill="#123045" opacity="0.55"></path>
+
+                        <!-- parco -->
+                        <path d="M255 10 Q330 0 350 55 Q365 100 320 120 Q265 130 250 85 Q235 40 255 10 Z" fill="#123420" opacity="0.6"></path>
+
+                        <!-- strade -->
+                        <path d="M0 60 H400 M0 150 H400 M0 240 H400" stroke="var(--b2)" stroke-width="2.5"></path>
+                        <path d="M90 0 V320 M210 0 V320 M330 0 V240" stroke="var(--b2)" stroke-width="2.5"></path>
+
+                        <!-- nomi vie -->
+                        <text x="94" y="56" fill="var(--mut)" font-size="8" font-family="Inter, sans-serif" letter-spacing="0.5">VIA ROMA</text>
+                        <text x="214" y="146" fill="var(--mut)" font-size="8" font-family="Inter, sans-serif" letter-spacing="0.5">CORSO ITALIA</text>
+                        <text x="16" y="236" fill="var(--mut)" font-size="8" font-family="Inter, sans-serif" letter-spacing="0.5">VIA DEL PARCO</text>
+
+                        <!-- edifici (ombra + corpo) -->
+                        <rect x="16" y="16" width="60" height="32" rx="4" fill="#000" opacity="0.35"></rect>
+                        <rect x="14" y="14" width="60" height="32" rx="4" fill="var(--bg2)"></rect>
+
+                        <rect x="112" y="20" width="80" height="26" rx="4" fill="#000" opacity="0.35"></rect>
+                        <rect x="110" y="18" width="80" height="26" rx="4" fill="var(--bg2)"></rect>
+
+                        <rect x="16" y="78" width="56" height="56" rx="4" fill="#000" opacity="0.35"></rect>
+                        <rect x="14" y="76" width="56" height="56" rx="4" fill="var(--bg2)"></rect>
+
+                        <rect x="112" y="72" width="80" height="62" rx="4" fill="#000" opacity="0.35"></rect>
+                        <rect x="110" y="70" width="80" height="62" rx="4" fill="var(--bg2)"></rect>
+
+                        <rect x="16" y="168" width="56" height="56" rx="4" fill="#000" opacity="0.35"></rect>
+                        <rect x="14" y="166" width="56" height="56" rx="4" fill="var(--bg2)"></rect>
+
+                        <rect x="232" y="168" width="70" height="56" rx="4" fill="#000" opacity="0.35"></rect>
+                        <rect x="230" y="166" width="70" height="56" rx="4" fill="var(--bg2)"></rect>
+
+                        <rect x="112" y="258" width="80" height="46" rx="4" fill="#000" opacity="0.35"></rect>
+                        <rect x="110" y="256" width="80" height="46" rx="4" fill="var(--bg2)"></rect>
+
+                        <rect x="332" y="258" width="56" height="46" rx="4" fill="#000" opacity="0.35"></rect>
+                        <rect x="330" y="256" width="56" height="46" rx="4" fill="var(--bg2)"></rect>
+
+                        <!-- bussola -->
+                        <g transform="translate(368,26)" opacity="0.85">
+                            <circle r="16" fill="var(--bg2)" stroke="var(--b2)" stroke-width="1.5"></circle>
+                            <path d="M0 -10 L4 0 L0 10 L-4 0 Z" fill="var(--acc)"></path>
+                            <text x="0" y="-19" fill="var(--mut)" font-size="7" font-family="Inter, sans-serif" text-anchor="middle">N</text>
+                        </g>
+                    </svg>
+
+                    <!-- chrome decorativo da app di mappe -->
+                    <div class="map-zoom" aria-hidden="true">
+                        <span>+</span>
+                        <span>−</span>
+                    </div>
+                    <div class="map-scale" aria-hidden="true">
+                        <span class="map-scale-bar"></span>
+                        <span class="map-scale-label">500 m</span>
+                    </div>
+
+                    <div class="you-are-here" style="top:50%; left:50%">
+                        <span class="yah-ring"></span>
+                        <span class="yah-dot"></span>
+                        <span class="yah-label">Sei qui</span>
+                    </div>
+
+                    <button type="button" class="map-pin" style="top:35%; left:30%" data-company="0" aria-label="Trattoria Da Marco">
+                        <i class="fa-solid fa-utensils"></i>
+                    </button>
+                    <button type="button" class="map-pin" style="top:28%; left:68%" data-company="1" aria-label="GreenBuild Costruzioni">
+                        <i class="fa-solid fa-helmet-safety"></i>
+                    </button>
+                    <button type="button" class="map-pin" style="top:62%; left:78%" data-company="2" aria-label="LogiExpress Nord">
+                        <i class="fa-solid fa-truck"></i>
+                    </button>
+                    <button type="button" class="map-pin" style="top:65%; left:22%" data-company="3" aria-label="Studio Dentistico Aurora">
+                        <i class="fa-solid fa-briefcase-medical"></i>
+                    </button>
+                    <button type="button" class="map-pin" style="top:78%; left:55%" data-company="4" aria-label="Retail Point">
+                        <i class="fa-solid fa-store"></i>
+                    </button>
+                    <button type="button" class="map-pin" style="top:18%; left:42%" data-company="5" aria-label="NovaTech Uffici">
+                        <i class="fa-solid fa-laptop-code"></i>
+                    </button>
+                </div>
+
+                <div class="detail-panel" id="detail-panel">
+                    <div class="detail-placeholder" id="detail-placeholder">
+                        <i class="fa-solid fa-hand-pointer"></i>
+                        <p>Clicca un pin sulla mappa per vedere i dettagli dell'azienda.</p>
+                    </div>
+                    <div class="detail-content" id="detail-content" hidden>
+                        <div class="detail-icon" id="detail-icon"><i class="fa-solid fa-building"></i></div>
+                        <h3 id="detail-name"></h3>
+                        <div class="detail-meta" id="detail-meta"></div>
+                        <div class="detail-badges">
+                            <span class="badge badge-size" id="detail-size"></span>
+                            <span class="badge" id="detail-status"></span>
+                        </div>
+                        <p class="detail-distance" id="detail-distance"></p>
+                        <button type="button" class="detail-cta" id="detail-cta">
+                            Candidati ora <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                        <p class="detail-future" id="detail-future"></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ══ PROBLEMA — recap breve ══ -->
+        <section class="section problem">
+            <h2>Perché è così difficile</h2>
+            <div class="cards">
+                <div class="card">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <h3>Gli annunci non bastano</h3>
+                    <p>La maggior parte delle aziende assume senza mai pubblicare un annuncio.</p>
+                </div>
+                <div class="card">
+                    <i class="fa-solid fa-map"></i>
+                    <h3>Zero visibilità</h3>
+                    <p>Non esiste un elenco delle aziende vicino a te.</p>
+                </div>
+                <div class="card">
+                    <i class="fa-solid fa-hourglass-half"></i>
+                    <h3>Candidature a tentoni</h3>
+                    <p>Mandi CV a caso, senza sapere se stanno assumendo.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ══ SOLUZIONE / COME FUNZIONA ══ -->
+        <section class="section how">
+            <h2>Come funzionerà Tipak</h2>
+            <div class="steps">
+                <div class="step">
+                    <span class="step-n">1</span>
+                    <h3>Apri la mappa</h3>
+                    <p>Attivi la posizione e vedi subito le aziende reali nella tua zona, per raggio di distanza.</p>
+                </div>
+                <div class="step">
+                    <span class="step-n">2</span>
+                    <h3>Filtra per settore</h3>
+                    <p>Ristorazione, retail, logistica, uffici... scegli cosa cercare e a quanti km sei disposto ad andare.</p>
+                </div>
+                <div class="step">
+                    <span class="step-n">3</span>
+                    <h3>Candidati subito</h3>
+                    <p>Invii la tua candidatura in un tap, anche se l'azienda non ha nessuna posizione aperta pubblicata.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ══ CTA FINALE ══ -->
+        <section class="section cta-final" id="waitlist">
+            <h2>Vuoi essere tra i primi a provarlo?</h2>
+            <p>Lasciaci la tua email: ti avvisiamo appena Tipak è pronto e potrai testarlo in anteprima.</p>
+
+            <form id="form-waitlist" class="waitlist-form" novalidate>
+                <input type="email" id="email-final" placeholder="La tua email" required autocomplete="email">
+                <button type="submit"><span>Iscrivimi alla waitlist</span> <i class="fa-solid fa-arrow-right"></i></button>
+            </form>
+            <p class="form-note" id="note-final">Nessuno spam. Ti scriviamo solo quando l'app è pronta.</p>
+        </section>
+    </main>
+
+    <footer class="foot">
+        <span>© 2026 Tipak</span>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
