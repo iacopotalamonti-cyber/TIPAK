@@ -1,514 +1,189 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tipak | Curriculab — Il CV che supera il filtro.</title>
-<meta name="description" content="Il 75% dei CV viene scartato da un software. Curriculab costruisce l'architettura ATS-ready per farti ottenere il colloquio.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&family=Inter:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-
-<!-- MOTORE DATABASE SUPABASE -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<style>
-/* === TOKENS === */
-:root {
-  --bg-main:    #050505;
-  --bg-sec:     #0a0a0a;
-  --text-pri:   #f8fafc;
-  --text-mut:   #94a3b8;
-  --acc-glow:   #ff6a00;
-  --acc-red:    #e11d48;
-  --glass-bg:   rgba(255,255,255,0.03);
-  --glass-brd:  rgba(255,255,255,0.08);
-}
-
-*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{
-  background:var(--bg-main);
-  color:var(--text-pri);
-  font-family:'Inter',sans-serif;
-  line-height:1.6;
-  overflow-x:hidden;
-  position:relative;
-}
-a{color:inherit;text-decoration:none}
-h1,h2,h3,.logo{font-family:'Plus Jakarta Sans',sans-serif}
-.container{max-width:1200px;margin:0 auto;padding:0 24px}
-
-/* === GLOW BG ARANCIONE === */
-.glow-bg{
-  position:absolute;top:-10%;left:50%;
-  transform:translateX(-50%);
-  width:800px;height:800px;
-  background:radial-gradient(circle,rgba(255,106,0,.15) 0%,rgba(225,29,72,.05) 40%,rgba(5,5,5,0) 70%);
-  z-index:-1;pointer-events:none;
-}
-
-/* === NAVBAR === */
-.navbar{
-  display:flex;justify-content:space-between;align-items:center;
-  padding:24px 40px;
-  background:rgba(5,5,5,.6);
-  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
-  position:fixed;top:0;width:100%;z-index:100;
-  border-bottom:1px solid var(--glass-brd);
-}
-.logo{font-size:20px;font-weight:800;letter-spacing:2px;display:flex;align-items:center;gap:12px}
-.logo .badge{
-  font-size:10px;font-weight:700;letter-spacing:1px;
-  background:rgba(255,106,0,.1);color:var(--acc-glow);
-  padding:4px 10px;border-radius:20px;
-  border:1px solid rgba(255,106,0,.2);
-}
-.nav-links{display:flex;gap:32px;align-items:center}
-.nav-links a{color:var(--text-mut);font-size:14px;font-weight:500;transition:color .2s}
-.nav-links a:hover{color:var(--text-pri)}
-.btn-nav{background:white;color:black !important;padding:8px 18px;border-radius:8px;font-weight:600 !important}
-
-/* === HERO === */
-.hero-section{
-  padding:180px 20px 100px;
-  text-align:center;
-  display:flex;flex-direction:column;align-items:center;
-}
-.announcement-pill{
-  display:inline-flex;align-items:center;gap:8px;
-  background:var(--glass-bg);border:1px solid var(--glass-brd);
-  padding:6px 16px;border-radius:100px;
-  font-size:13px;color:var(--text-mut);
-  margin-bottom:30px;
-}
-.pulse-dot{
-  width:8px;height:8px;background:var(--acc-glow);border-radius:50%;
-  box-shadow:0 0 10px var(--acc-glow);
-  animation:pulse 2s infinite;
-}
-@keyframes pulse{0%{opacity:1}50%{opacity:.4}100%{opacity:1}}
-
-.gradient-text{
-  font-size:72px;font-weight:800;line-height:1.1;letter-spacing:-2px;
-  background:linear-gradient(135deg,#ffffff 30%,#94a3b8 100%);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-  margin-bottom:24px;
-}
-.hero-subtext{
-  font-size:20px;color:var(--text-mut);
-  max-width:650px;margin:0 auto 40px;line-height:1.6;
-}
-
-/* Email form */
-.form-wrap{max-width:480px;width:100%;margin:0 auto}
-.form-row{
-  display:flex;
-  background:rgba(255,255,255,.04);
-  border:1px solid var(--glass-brd);
-  border-radius:12px;overflow:hidden;
-  margin-bottom:12px;
-  transition:border-color .2s;
-}
-.form-row:focus-within{border-color:rgba(255,106,0,.4)}
-.form-row.err{border-color:rgba(225,29,72,.5)}
-.e-input{
-  flex:1;min-width:0;
-  background:transparent;border:none;
-  color:var(--text-pri);
-  font-family:'Inter',sans-serif;font-size:15px;
-  padding:15px 20px;outline:none;
-}
-.e-input::placeholder{color:var(--text-mut)}
-.btn-submit{
-  background:linear-gradient(135deg,var(--acc-glow),var(--acc-red));
-  border:none;color:white;
-  font-family:'Plus Jakarta Sans',sans-serif;
-  font-size:14px;font-weight:700;
-  padding:15px 24px;cursor:pointer;white-space:nowrap;
-  transition:opacity .2s;
-}
-.btn-submit:hover{opacity:.85}
-.form-note{font-size:12px;color:#475569;text-align:center}
-.form-ok{
-  display:none;
-  color:var(--acc-glow);font-weight:600;font-size:16px;
-  padding:12px 0;font-family:'Plus Jakarta Sans',sans-serif;
-}
-
-/* === SHARED SECTION === */
-.section-label{
-  display:inline-block;
-  font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
-  color:var(--acc-glow);margin-bottom:12px;
-}
-.section-title{font-size:36px;font-weight:700;margin-bottom:20px;letter-spacing:-1px}
-.section-desc{font-size:18px;color:var(--text-mut);max-width:700px;margin:0 auto}
-.section-header{text-align:center;margin-bottom:48px}
-
-/* === GLASS CARDS === */
-.features-section{padding:40px 0 100px}
-.grid-features{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:24px}
-.glass-card{
-  background:var(--glass-bg);border:1px solid var(--glass-brd);
-  padding:40px;border-radius:20px;
-  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-  transition:transform .3s,border-color .3s;
-}
-.glass-card:hover{transform:translateY(-5px);border-color:rgba(255,255,255,.2)}
-.highlight-card{
-  background:linear-gradient(180deg,rgba(255,106,0,.05) 0%,var(--glass-bg) 100%);
-  border-top:1px solid rgba(255,106,0,.3);
-}
-.icon-wrapper{
-  width:50px;height:50px;border-radius:12px;
-  background:rgba(255,255,255,.05);border:1px solid var(--glass-brd);
-  display:flex;align-items:center;justify-content:center;
-  font-size:20px;color:var(--acc-glow);margin-bottom:24px;
-}
-.step-num{
-  font-family:'Plus Jakarta Sans',sans-serif;
-  font-size:52px;font-weight:800;line-height:1;
-  background:linear-gradient(135deg,var(--acc-glow),var(--acc-red));
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-  opacity:.35;margin-bottom:20px;letter-spacing:-2px;
-}
-.glass-card h3{font-size:22px;margin-bottom:12px;color:var(--text-pri)}
-.glass-card p{font-size:15px;color:var(--text-mut);line-height:1.6}
-
-/* === PROBLEMA === */
-.problem-section{padding:100px 0;text-align:center}
-.stat-number{
-  display:block;
-  font-family:'Plus Jakarta Sans',sans-serif;
-  font-size:clamp(100px,18vw,220px);font-weight:800;
-  line-height:.82;letter-spacing:-6px;
-  background:linear-gradient(135deg,var(--acc-glow),var(--acc-red));
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-  margin-bottom:36px;
-}
-.problem-callout{
-  font-size:20px;font-weight:600;
-  font-family:'Plus Jakarta Sans',sans-serif;
-  color:var(--acc-glow);margin-top:24px;
-}
-
-/* === RADAR === */
-.radar-section{padding:0 0 100px}
-.radar-box{
-  background:var(--glass-bg);border:1px solid var(--glass-brd);
-  border-radius:30px;padding:72px 64px;
-  display:grid;grid-template-columns:1fr 1fr;
-  gap:80px;align-items:center;
-  background-image:radial-gradient(circle at top left,rgba(255,106,0,.07),transparent 55%);
-}
-.radar-badge{
-  display:inline-flex;align-items:center;gap:8px;
-  background:rgba(255,106,0,.08);border:1px solid rgba(255,106,0,.2);
-  color:var(--acc-glow);
-  font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
-  padding:5px 14px;border-radius:100px;margin-bottom:20px;
-}
-.radar-box h2{font-size:40px;font-weight:700;letter-spacing:-1px;margin-bottom:16px}
-.radar-box .radar-desc{font-size:16px;color:var(--text-mut);line-height:1.78;margin-bottom:32px}
-.radar-form-row{
-  display:flex;
-  background:rgba(255,255,255,.04);border:1px solid var(--glass-brd);
-  border-radius:12px;overflow:hidden;max-width:380px;
-  transition:border-color .2s;
-}
-.radar-form-row:focus-within{border-color:rgba(255,106,0,.4)}
-.radar-form-row.err{border-color:rgba(225,29,72,.5)}
-
-/* Dot map */
-.dot-map{display:grid;grid-template-columns:repeat(12,1fr);grid-template-rows:repeat(8,1fr);gap:16px;height:260px}
-.dm-d{width:4px;height:4px;border-radius:50%;background:rgba(255,255,255,.07);margin:auto}
-.dm-d.a{
-  background:var(--acc-glow);
-  box-shadow:0 0 7px rgba(255,106,0,.7),0 0 16px rgba(255,106,0,.3);
-  animation:dm-p 2.2s ease-in-out infinite;
-}
-.dm-d.s{background:rgba(255,106,0,.28);width:3.5px;height:3.5px}
-@keyframes dm-p{
-  0%,100%{transform:scale(1);box-shadow:0 0 6px rgba(255,106,0,.6)}
-  50%    {transform:scale(1.8);box-shadow:0 0 14px rgba(255,106,0,1),0 0 28px rgba(255,106,0,.4)}
-}
-
-/* === CTA SECTION === */
-.cta-section{padding:60px 0 100px}
-.cta-glass-box{
-  background:var(--glass-bg);border:1px solid var(--glass-brd);
-  padding:80px 40px;border-radius:30px;text-align:center;
-  background-image:radial-gradient(circle at top right,rgba(225,29,72,.1),transparent 40%);
-}
-.cta-glass-box h2{font-size:40px;font-weight:700;margin-bottom:16px;letter-spacing:-1px}
-.cta-glass-box .cta-sub{font-size:18px;color:var(--text-mut);margin-bottom:40px}
-.cta-form-center{max-width:480px;width:100%;margin:0 auto}
-
-/* === FOOTER === */
-footer{border-top:1px solid var(--glass-brd);padding:40px 0}
-.footer-inner{display:flex;justify-content:space-between;align-items:center}
-.footer-logo{font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:18px;letter-spacing:2px;color:var(--text-mut)}
-.copyright{font-size:14px;color:#475569}
-.footer-app{font-size:13px;color:var(--text-mut);font-weight:500;transition:color .2s}
-.footer-app:hover{color:var(--acc-glow)}
-
-/* === RESPONSIVE === */
-@media(max-width:768px){
-  .navbar{padding:16px 20px}
-  .nav-links a:not(.btn-nav){display:none}
-  .hero-section{padding:140px 20px 80px}
-  .gradient-text{font-size:42px;letter-spacing:-1px}
-  .section-title{font-size:28px}
-  .radar-box{grid-template-columns:1fr;padding:48px 28px;gap:36px}
-  .radar-form-row{max-width:100%}
-  .dot-map{display:none}
-  .cta-glass-box{padding:50px 20px}
-  .footer-inner{flex-direction:column;gap:16px;text-align:center}
-}
-@media(max-width:520px){
-  .form-row{flex-direction:column}
-  .e-input{border-bottom:1px solid var(--glass-brd)}
-  .radar-form-row{flex-direction:column}
-  .radar-form-row .e-input{border-bottom:1px solid var(--glass-brd)}
-  .gradient-text{font-size:36px}
-}
-@media(prefers-reduced-motion:reduce){
-  .pulse-dot,.dm-d.a{animation:none}
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tipak — Un unico posto per cercare lavoro</title>
+    <meta name="description" content="Tipak riunisce tutto quello che ti serve per trovare il prossimo lavoro: le aziende vicino a te e un CV pronto per superare i filtri automatici.">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
 
-<div class="glow-bg"></div>
+    <header class="nav">
+        <a href="/" class="tipak-logo">
+            <svg viewBox="0 0 28 28" width="24" height="24" aria-hidden="true">
+                <path d="M14 1C7.5 1 3 5.8 3 12c0 6 5.5 11.5 11 15 5.5-3.5 11-9 11-15 0-6.2-4.5-11-11-11Z" fill="#ff6a00"/>
+                <circle cx="14" cy="12" r="4.3" fill="#fff"/>
+            </svg>
+            <span class="tipak-logo-word">TIPAK</span>
+        </a>
+        <nav class="nav-links">
+            <a href="#prodotti">Prodotti</a>
+            <a href="#perche">Perché Tipak</a>
+            <a href="/articoli/">Articoli</a>
+            <a href="#faq">FAQ</a>
+        </nav>
+        <a href="/curriculab/" class="nav-cta">Crea il tuo CV</a>
+    </header>
 
-<!-- NAVBAR -->
-<nav class="navbar">
-  <div class="logo">TIPAK <span class="badge">CURRICULAB</span></div>
-  <div class="nav-links">
-    <a href="#soluzione">Il Problema</a>
-    <a href="#come-funziona">Come Funziona</a>
-    <a href="#radar">Radar</a>
-    <a href="app/index.html" class="btn-nav">Accedi all'App</a>
-  </div>
-</nav>
+    <main>
+        <!-- ══ HERO ══ -->
+        <section class="hero">
+            <h1>Un unico posto per<br>cercare lavoro.</h1>
+            <p class="hero-sub">
+                Oggi cercare lavoro significa avere aperte dieci piattaforme diverse, senza mai capire da dove
+                iniziare. Tipak riunisce tutto in un posto solo: <strong>le aziende vicino a te</strong> e,
+                se ti serve, <strong>un CV pronto per superare i filtri automatici</strong>.
+            </p>
+            <div class="hero-ctas">
+                <a href="/curriculab/" class="btn btn-primary">Crea il tuo CV <i class="fa-solid fa-arrow-right"></i></a>
+                <a href="/aziende/" class="btn btn-secondary">Scopri Aziende vicine</a>
+            </div>
+        </section>
 
-<!-- HERO -->
-<header class="hero-section">
-  <div class="announcement-pill">
-    <span class="pulse-dot"></span>
-    Beta aperta &middot; Accesso anticipato gratuito
-  </div>
-  <h1 class="gradient-text">L'ingegneria del<br>Curriculum perfetto.</h1>
-  <p class="hero-subtext">
-    Il 75% dei CV viene scartato da un software prima ancora di essere letto da un essere umano.
-    Curriculab costruisce l'architettura esatta che i sistemi ATS delle grandi aziende si aspettano.
-  </p>
-  <div class="form-wrap" id="hWrap">
-    <div class="form-row" id="hRow">
-      <input class="e-input" type="email" id="hEmail" placeholder="La tua email" autocomplete="email">
-      <button class="btn-submit" type="button" onclick="sub('h')">
-        Entra in Beta &nbsp;<i class="fa-solid fa-arrow-right"></i>
-      </button>
-    </div>
-    <p class="form-note">Gratuito durante la beta &middot; Nessuna carta richiesta</p>
-  </div>
-  <p class="form-ok" id="hOk">Iscrizione confermata. Benvenuto in Tipak.</p>
-</header>
+        <!-- ══ PROBLEMA ══ -->
+        <section class="section problem reveal">
+            <div class="section-head">
+                <span class="eyebrow">Il problema</span>
+                <h2>Cercare lavoro oggi è più difficile di quanto dovrebbe.</h2>
+            </div>
+            <div class="problem-grid">
+                <div class="problem-item">
+                    <i class="fa-solid fa-layer-group"></i>
+                    <p><strong>Decine di piattaforme diverse</strong> — LinkedIn, Indeed, siti aziendali, passaparola. Ognuna con un pezzo dell'informazione, nessuna che le mette insieme.</p>
+                </div>
+                <div class="problem-item">
+                    <i class="fa-solid fa-filter"></i>
+                    <p><strong>CV scartati prima di essere letti</strong> — i filtri ATS automatici eliminano candidati validi solo perché il CV non è formattato nel modo giusto.</p>
+                </div>
+                <div class="problem-item">
+                    <i class="fa-solid fa-map-location-dot"></i>
+                    <p><strong>Aziende invisibili</strong> — la maggior parte assume senza mai pubblicare un annuncio, e non hai modo di sapere chi c'è vicino a te.</p>
+                </div>
+            </div>
+        </section>
 
-<!-- IL PROBLEMA -->
-<section id="soluzione" class="problem-section">
-  <div class="container">
-    <span class="section-label">Il Problema</span>
-    <span class="stat-number">75%</span>
-    <h2 class="section-title">Perché il tuo CV viene scartato in 6 secondi?</h2>
-    <p class="section-desc">
-      I formati grafici complessi sono invisibili ai software di selezione (ATS) usati dalle grandi aziende.
-      Tipak ha creato Curriculab per offrirti l'esatto standard visivo e strutturale che i direttori HR esigono.
-    </p>
-    <p class="problem-callout">Non hai sbagliato lavoro. Hai sbagliato formato.</p>
-  </div>
-</section>
+        <!-- ══ PRODOTTI ══ -->
+        <section class="section products reveal" id="prodotti">
+            <div class="section-head">
+                <span class="eyebrow">Cosa offre Tipak</span>
+                <h2>Due strumenti, un'unica missione.</h2>
+                <p>Puoi usarli insieme o separatamente — l'obiettivo è sempre lo stesso: farti trovare lavoro più in fretta.</p>
+            </div>
+            <div class="products-grid">
+                <div class="product-card">
+                    <span class="product-badge badge-live"><i class="fa-solid fa-circle-check"></i> Disponibile ora</span>
+                    <h3>Curriculab</h3>
+                    <p>Crea un curriculum ATS-ready in pochi minuti. Compili una volta, vedi il risultato in tempo reale, e scarichi un PDF con testo vero — selezionabile e leggibile dai sistemi di selezione automatica, non un'immagine come fanno molti altri CV builder.</p>
+                    <ul class="product-features">
+                        <li><i class="fa-solid fa-check"></i> Punteggio di compatibilità ATS in tempo reale</li>
+                        <li><i class="fa-solid fa-check"></i> Anteprima live mentre scrivi</li>
+                        <li><i class="fa-solid fa-check"></i> PDF con testo selezionabile, non un'immagine</li>
+                    </ul>
+                    <a href="/curriculab/" class="btn btn-primary">Crea il tuo CV <i class="fa-solid fa-arrow-right"></i></a>
+                </div>
+                <div class="product-card">
+                    <span class="product-badge badge-soon"><i class="fa-solid fa-clock"></i> In arrivo</span>
+                    <h3>Aziende vicino a te</h3>
+                    <p>Una mappa che ti mostra le aziende della tua zona dove proporti per lavorare — comprese quelle che non hanno pubblicato nessun annuncio. Stiamo validando l'idea: prova la demo e iscriviti alla waitlist.</p>
+                    <ul class="product-features">
+                        <li><i class="fa-solid fa-check"></i> Mappa interattiva delle aziende locali</li>
+                        <li><i class="fa-solid fa-check"></i> Candidatura diretta, anche senza annunci attivi</li>
+                        <li><i class="fa-solid fa-check"></i> Filtra per settore e distanza</li>
+                    </ul>
+                    <a href="/aziende/" class="btn btn-secondary">Scopri il progetto <i class="fa-solid fa-arrow-right"></i></a>
+                </div>
+            </div>
+        </section>
 
-<!-- COME FUNZIONA -->
-<section id="come-funziona" class="features-section">
-  <div class="container">
-    <div class="section-header">
-      <span class="section-label">Come Funziona</span>
-      <h2 class="section-title">Tre passi. Un documento che funziona.</h2>
-    </div>
-    <div class="grid-features">
-      <div class="glass-card">
-        <div class="step-num">I</div>
-        <h3>Inserisci il tuo profilo una volta sola.</h3>
-        <p>Curriculab gestisce struttura, ordine cronologico e formattazione. Tu pensi ai contenuti — il sistema pensa alla macchina che li leggerà.</p>
-      </div>
-      <div class="glass-card highlight-card">
-        <div class="step-num">II</div>
-        <h3>Genera il PDF con architettura ATS-ready.</h3>
-        <p>Colonna singola, metadati semantici, zero grafica superflua. La struttura che i sistemi di selezione delle grandi aziende leggono perfettamente.</p>
-      </div>
-      <div class="glass-card">
-        <div class="step-num">III</div>
-        <h3>Candidati. Vieni letto.</h3>
-        <p>Il sistema ATS ti processa correttamente. Il recruiter ti vede. Il colloquio smette di essere una questione di fortuna.</p>
-      </div>
-    </div>
-  </div>
-</section>
+        <!-- ══ PERCHÉ TIPAK ══ -->
+        <section class="section why reveal" id="perche">
+            <div class="section-head">
+                <span class="eyebrow">Perché Tipak</span>
+                <h2>Un unico posto, non l'ennesima piattaforma.</h2>
+            </div>
+            <p class="why-body">
+                Non vogliamo essere un'altra bacheca di annunci. Tipak nasce per essere il punto di partenza
+                della tua ricerca lavoro: <strong>capisci quali aziende ci sono vicino a te</strong>,
+                <strong>ti presenti nel modo giusto</strong>, e ti candidi — tutto senza uscire da qui.
+                È un progetto giovane, costruito passo dopo passo insieme alle persone che lo useranno.
+            </p>
+        </section>
 
-<!-- VANTAGGI -->
-<section id="vantaggi" class="features-section" style="padding-top:0">
-  <div class="container">
-    <div class="section-header">
-      <span class="section-label">Vantaggi</span>
-      <h2 class="section-title">Perché Curriculab è diverso.</h2>
-    </div>
-    <div class="grid-features">
-      <div class="glass-card">
-        <div class="icon-wrapper"><i class="fa-solid fa-microchip"></i></div>
-        <h3>Architettura Anti-Scarto</h3>
-        <p>Struttura logica testata per garantire il 100% di leggibilità da parte dei sistemi di Intelligenza Artificiale e Applicant Tracking Systems.</p>
-      </div>
-      <div class="glass-card highlight-card">
-        <div class="icon-wrapper"><i class="fa-solid fa-crosshairs"></i></div>
-        <h3>Zero Distrazioni</h3>
-        <p>Una Modalità Focus a tutto schermo. Concentrati solo sull'essenza della tua storia professionale, al design ci pensa l'algoritmo.</p>
-      </div>
-      <div class="glass-card">
-        <div class="icon-wrapper"><i class="fa-solid fa-location-dot"></i></div>
-        <h3>Talent Scouting Diretto</h3>
-        <p>Salva il tuo profilo su Tipak. Oltre ad avere il tuo PDF perfetto, entrerai nel radar per opportunità esclusive e ricerche dirette.</p>
-      </div>
-    </div>
-  </div>
-</section>
+        <!-- ══ FAQ ══ -->
+        <section class="section faq reveal" id="faq">
+            <div class="section-head">
+                <span class="eyebrow">Domande frequenti</span>
+                <h2>Domande frequenti</h2>
+            </div>
+            <div class="faq-list">
+                <details class="faq-item">
+                    <summary>Tipak è gratis?</summary>
+                    <p>Sì. Curriculab è gratuito e lo resta nella sua versione base. Anche l'iscrizione alla waitlist di Aziende vicine è gratuita.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>Quando arriva la funzione Aziende vicine?</summary>
+                    <p>Stiamo validando l'idea con una demo e una waitlist. Se c'è abbastanza interesse, iniziamo a costruire l'app vera partendo da una zona pilota.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>I miei dati sono al sicuro?</summary>
+                    <p>I dati del CV restano nel tuo browser finché non scegli di scaricare il PDF. Le email della waitlist servono solo per avvisarti quando il prodotto è pronto — niente spam.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>Posso usare solo Curriculab senza iscrivermi a nulla?</summary>
+                    <p>Sì, Curriculab è utilizzabile subito, senza registrazione.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>Come contatto Tipak?</summary>
+                    <p>Scrivici a <a href="mailto:ciao@tipak.me" style="color:var(--acc)">ciao@tipak.me</a> per domande, feedback o collaborazioni.</p>
+                </details>
+            </div>
+        </section>
 
-<!-- RADAR TERRITORIALE -->
-<section id="radar" class="radar-section">
-  <div class="container">
-    <div class="radar-box">
-      <!-- Left: copy + form -->
-      <div>
-        <span class="radar-badge">
-          <i class="fa-solid fa-circle-dot" style="font-size:8px"></i>
-          Prossimamente
-        </span>
-        <h2>Il Radar Territoriale.</h2>
-        <p class="radar-desc">
-          Stiamo mappando le grandi aziende industriali e di servizi del tuo territorio — con il link diretto alla loro pagina di candidatura interna. Niente più caccia al form nascosto. Niente più mail all'indirizzo sbagliato.
-        </p>
-        <div class="radar-form-row" id="rRow">
-          <input class="e-input" type="email" id="rEmail" placeholder="Avvisami al lancio" autocomplete="email">
-          <button class="btn-submit" type="button" id="rBtn" onclick="sub('r')">Notificami</button>
+        <!-- ══ CTA FINALE ══ -->
+        <section class="section cta-final reveal">
+            <div class="section-head">
+                <h2>Pronto a iniziare?</h2>
+                <p>Crea il tuo CV in pochi minuti, oppure scopri come funzionerà la mappa delle aziende vicine.</p>
+            </div>
+            <div class="hero-ctas">
+                <a href="/curriculab/" class="btn btn-primary">Crea il tuo CV <i class="fa-solid fa-arrow-right"></i></a>
+                <a href="/aziende/" class="btn btn-secondary">Scopri Aziende vicine</a>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="foot">
+            <div class="foot-brand">
+                <a href="/" class="tipak-logo">
+                    <svg viewBox="0 0 28 28" width="22" height="22" aria-hidden="true">
+                        <path d="M14 1C7.5 1 3 5.8 3 12c0 6 5.5 11.5 11 15 5.5-3.5 11-9 11-15 0-6.2-4.5-11-11-11Z" fill="#ff6a00"/>
+                        <circle cx="14" cy="12" r="4.3" fill="#fff"/>
+                    </svg>
+                    <span class="tipak-logo-word">TIPAK</span>
+                </a>
+                <p>Un unico posto per cercare lavoro.</p>
+            </div>
+            <div class="foot-cols">
+                <div class="foot-col">
+                    <h4>Prodotti</h4>
+                    <a href="/curriculab/">Curriculab</a>
+                    <a href="/aziende/">Aziende vicine</a>
+                </div>
+                <div class="foot-col">
+                    <h4>Risorse</h4>
+                    <a href="/articoli/">Articoli</a>
+                </div>
+            </div>
         </div>
-        <p class="form-ok" id="rOk" style="text-align:left;padding-top:14px">Ricevuto. Ti avviseremo al lancio.</p>
-      </div>
+        <div class="foot-bottom">© 2026 Tipak</div>
+    </footer>
 
-      <!-- Right: dot map -->
-      <div class="dot-map" id="dotMap" aria-hidden="true"></div>
-    </div>
-  </div>
-</section>
-
-<!-- CTA FINALE -->
-<section class="cta-section" id="waitlist">
-  <div class="container">
-    <div class="cta-glass-box">
-      <h2>Pronto a scalare la tua carriera?</h2>
-      <p class="cta-sub">Sii tra i primi. Il tuo next step inizia da qui.</p>
-      <div id="wWrap" class="cta-form-center">
-        <div class="form-row" id="wRow">
-          <input class="e-input" type="email" id="wEmail" placeholder="La tua email" autocomplete="email">
-          <button class="btn-submit" type="button" onclick="sub('w')">
-            Iscriviti ora &nbsp;<i class="fa-solid fa-arrow-right"></i>
-          </button>
-        </div>
-        <p class="form-note">Zero spam &middot; I tuoi dati restano tuoi &middot; Cancellazione sempre disponibile</p>
-      </div>
-      <p class="form-ok" id="wOk">Sei dentro. A presto.</p>
-    </div>
-  </div>
-</section>
-
-<!-- FOOTER -->
-<footer>
-  <div class="container footer-inner">
-    <div class="footer-logo">TIPAK</div>
-    <p class="copyright">&copy; 2026 Tipak.me. Tutti i diritti riservati. Progettato per l'eccellenza HR.</p>
-    <a href="app/index.html" class="footer-app">Curriculab &nbsp;&#8599;</a>
-  </div>
-</footer>
-
-<script>
-// =====================================================================
-// COLLEGAMENTO REALE A SUPABASE
-// =====================================================================
-const databaseUrl = 'https://tpjqblsrdcnqlxqdztql.supabase.co';
-const databaseKey = 'sb_publishable_o61X1d-esqvG4jW5qKPYyA_gM6QRH3o';
-const supabaseClient = window.supabase.createClient(databaseUrl, databaseKey);
-
-async function sub(key) {
-  const cfg = {
-    h: { ei:'hEmail', wi:'hWrap', ri:'hRow', ok:'hOk' },
-    r: { ei:'rEmail', wi:null,   ri:'rRow', ok:'rOk' },
-    w: { ei:'wEmail', wi:'wWrap', ri:'wRow', ok:'wOk' }
-  };
-  const {ei, wi, ri, ok} = cfg[key];
-  const emailEl = document.getElementById(ei);
-  const rowEl   = document.getElementById(ri);
-  const val = (emailEl.value || '').trim();
-
-  // Controllo validità email
-  if (!val || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) {
-    rowEl.classList.add('err');
-    emailEl.focus();
-    setTimeout(() => rowEl.classList.remove('err'), 1800);
-    return;
-  }
-
-  // Invio dei dati a Supabase (Tabella 'waitlist')
-  const { data, error } = await supabaseClient
-      .from('waitlist')
-      .insert([{ email: val }]);
-
-  if (error) {
-      alert("Errore di connessione a Supabase. Controlla le impostazioni RLS nel tuo pannello.");
-      console.error(error);
-      return;
-  }
-
-  // Animazione UI al successo
-  if (wi) document.getElementById(wi).style.display = 'none';
-  else rowEl.style.display = 'none';
-
-  const okEl = document.getElementById(ok);
-  if (okEl) okEl.style.display = 'block';
-}
-
-/* Invio con il tasto Invio (Enter) */
-document.querySelectorAll('input[type="email"]').forEach(el => {
-  el.addEventListener('keydown', e => {
-    if (e.key !== 'Enter') return;
-    ({hEmail:'h', rEmail:'r', wEmail:'w'})[el.id] && sub(({hEmail:'h', rEmail:'r', wEmail:'w'})[el.id]);
-  });
-});
-
-/* ── DOT MAP (Radar Animation) ───────────────────────────────────────*/
-(function(){
-  const map = document.getElementById('dotMap');
-  if (!map) return;
-  const cols = 12, rows = 8;
-  const active = new Set([26,27,38,39,40,50,51,52,62,63,75]);
-  const semi   = new Set([13,14,25,28,37,41,49,53,61,64,74,76,86,87]);
-  for (let i = 0; i < cols * rows; i++) {
-    const d = document.createElement('div');
-    d.className = 'dm-d' + (active.has(i) ? ' a' : semi.has(i) ? ' s' : '');
-    if (active.has(i)) d.style.animationDelay = (Math.random() * 1.8).toFixed(2) + 's';
-    map.appendChild(d);
-  }
-})();
-</script>
+    <script src="brand.js"></script>
 </body>
 </html>

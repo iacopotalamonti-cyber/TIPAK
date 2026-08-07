@@ -1,0 +1,567 @@
+/* ══════════════════════════════════════════════════════════════
+   TIPAK — sistema visivo condiviso dalle pagine di brand
+   (root, chi-siamo/, articoli/) — stile minimal scuro ispirato a
+   Linear/Stripe. Le pagine di prodotto (curriculab/, aziende/)
+   hanno un proprio style.css indipendente.
+   ══════════════════════════════════════════════════════════════ */
+
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --bg:      #050505;
+    --bg2:     #0a0a0a;
+    --card:    #0d0d0d;
+    --b:       #1c1c1c;
+    --b2:      #262626;
+    --pri:     #f7f7f8;
+    --mut:     #8b8f98;
+    --acc:     #ff6a00;
+    --acc-a:   rgba(255, 106, 0, 0.10);
+    --acc-b:   rgba(255, 106, 0, 0.28);
+    --green:   #16a34a;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    color: var(--pri);
+    background: var(--bg);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+}
+
+a { color: inherit; }
+
+.wrap {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding-left: 6vw;
+    padding-right: 6vw;
+}
+
+/* ── Reveal on scroll ── */
+.reveal {
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity .6s ease, transform .6s ease;
+}
+.reveal.revealed {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ── Logo (riusato in ogni header) ── */
+.tipak-logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    text-decoration: none;
+    color: inherit;
+}
+.tipak-logo-word {
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    font-size: 15px;
+}
+
+/* ── Nav ── */
+.nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 6vw;
+    background: rgba(5, 5, 5, 0.8);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--b);
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+}
+
+.nav-links a {
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--mut);
+    text-decoration: none;
+    transition: color .15s;
+}
+.nav-links a:hover { color: var(--pri); }
+
+.nav-cta {
+    font-size: 13px;
+    font-weight: 700;
+    background: var(--acc);
+    color: #050505;
+    padding: 9px 16px;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: opacity .15s;
+}
+.nav-cta:hover { opacity: .88; }
+
+.nav-toggle { display: none; }
+
+@media (max-width: 780px) {
+    .nav-links { display: none; }
+}
+
+/* ── Eyebrow label ── */
+.eyebrow {
+    display: inline-block;
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--acc);
+    margin-bottom: 16px;
+}
+
+/* ── Hero ── */
+.hero {
+    position: relative;
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 130px 6vw 100px;
+    text-align: center;
+    overflow: hidden;
+}
+
+.hero::before {
+    content: '';
+    position: absolute;
+    top: -200px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 900px;
+    height: 500px;
+    background: radial-gradient(ellipse at center, rgba(255, 106, 0, 0.14) 0%, transparent 65%);
+    pointer-events: none;
+    z-index: -1;
+}
+
+.hero h1 {
+    font-size: clamp(38px, 6vw, 62px);
+    font-weight: 800;
+    line-height: 1.08;
+    letter-spacing: -1.5px;
+    margin-bottom: 24px;
+}
+
+.hero-sub {
+    font-size: clamp(16px, 2vw, 19px);
+    color: var(--mut);
+    max-width: 600px;
+    margin: 0 auto 40px;
+}
+
+.hero-sub strong { color: var(--pri); font-weight: 600; }
+
+.hero-ctas {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 13px 22px;
+    border-radius: 10px;
+    text-decoration: none;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: opacity .15s, border-color .15s, transform .1s;
+}
+
+.btn-primary {
+    background: var(--acc);
+    color: #050505;
+}
+.btn-primary:hover { opacity: .88; }
+
+.btn-secondary {
+    background: transparent;
+    color: var(--pri);
+    border-color: var(--b2);
+}
+.btn-secondary:hover { border-color: var(--acc-b); }
+
+.btn:active { transform: scale(.97); }
+
+/* ── Sections ── */
+.section {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 100px 6vw;
+    border-top: 1px solid var(--b);
+}
+
+.section-head {
+    max-width: 640px;
+    margin: 0 auto 56px;
+    text-align: center;
+}
+
+.section-head h2 {
+    font-size: clamp(28px, 4vw, 40px);
+    font-weight: 800;
+    letter-spacing: -1px;
+    line-height: 1.15;
+}
+
+.section-head p {
+    margin-top: 16px;
+    color: var(--mut);
+    font-size: 15.5px;
+}
+
+/* ── Problema ── */
+.problem-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--b);
+    border: 1px solid var(--b);
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.problem-item {
+    background: var(--bg);
+    padding: 32px 28px;
+}
+
+.problem-item i {
+    font-size: 18px;
+    color: var(--acc);
+    margin-bottom: 16px;
+    display: block;
+}
+
+.problem-item p {
+    font-size: 14.5px;
+    color: var(--mut);
+    line-height: 1.6;
+}
+.problem-item strong { color: var(--pri); font-weight: 600; }
+
+@media (max-width: 780px) {
+    .problem-grid { grid-template-columns: 1fr; }
+}
+
+/* ── Prodotti ── */
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.product-card {
+    background: var(--card);
+    border: 1px solid var(--b);
+    border-radius: 18px;
+    padding: 36px 32px;
+    display: flex;
+    flex-direction: column;
+}
+
+.product-badge {
+    display: inline-flex;
+    align-self: flex-start;
+    align-items: center;
+    gap: 6px;
+    font-size: 11.5px;
+    font-weight: 700;
+    padding: 5px 11px;
+    border-radius: 999px;
+    margin-bottom: 20px;
+}
+
+.badge-live {
+    background: rgba(22, 163, 74, 0.12);
+    color: var(--green);
+    border: 1px solid rgba(22, 163, 74, 0.3);
+}
+
+.badge-soon {
+    background: var(--acc-a);
+    color: var(--acc);
+    border: 1px solid var(--acc-b);
+}
+
+.product-card h3 {
+    font-size: 23px;
+    font-weight: 800;
+    letter-spacing: -.5px;
+    margin-bottom: 12px;
+}
+
+.product-card > p {
+    font-size: 14.5px;
+    color: var(--mut);
+    margin-bottom: 22px;
+}
+
+.product-features {
+    list-style: none;
+    margin-bottom: 28px;
+    flex-grow: 1;
+}
+
+.product-features li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 13.5px;
+    color: var(--pri);
+    padding: 8px 0;
+    border-top: 1px solid var(--b);
+}
+.product-features li:first-child { border-top: none; }
+
+.product-features i {
+    color: var(--acc);
+    font-size: 12px;
+    margin-top: 3px;
+    flex-shrink: 0;
+}
+
+@media (max-width: 780px) {
+    .products-grid { grid-template-columns: 1fr; }
+}
+
+/* ── Perché Tipak ── */
+.why {
+    text-align: center;
+}
+
+.why-body {
+    max-width: 680px;
+    margin: 0 auto;
+    font-size: 16px;
+    color: var(--mut);
+    line-height: 1.75;
+}
+
+.why-body strong { color: var(--pri); }
+
+/* ── FAQ ── */
+.faq-list {
+    max-width: 720px;
+    margin: 0 auto;
+}
+
+.faq-item {
+    border-top: 1px solid var(--b);
+    padding: 4px 0;
+}
+.faq-item:last-child { border-bottom: 1px solid var(--b); }
+
+.faq-item summary {
+    list-style: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 20px 4px;
+    font-size: 15.5px;
+    font-weight: 600;
+}
+.faq-item summary::-webkit-details-marker { display: none; }
+
+.faq-item summary::after {
+    content: '+';
+    font-size: 20px;
+    font-weight: 400;
+    color: var(--acc);
+    flex-shrink: 0;
+    transition: transform .2s;
+}
+.faq-item[open] summary::after { transform: rotate(45deg); }
+
+.faq-item p {
+    font-size: 14.5px;
+    color: var(--mut);
+    padding: 0 4px 22px;
+    line-height: 1.65;
+    max-width: 600px;
+}
+
+/* ── CTA finale ── */
+.cta-final {
+    text-align: center;
+}
+
+.cta-final p {
+    color: var(--mut);
+    max-width: 480px;
+    margin: 0 auto 32px;
+    font-size: 15.5px;
+}
+
+/* ── Footer ── */
+.foot {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 60px 6vw 40px;
+    border-top: 1px solid var(--b);
+    display: flex;
+    justify-content: space-between;
+    gap: 40px;
+    flex-wrap: wrap;
+}
+
+.foot-brand p {
+    margin-top: 12px;
+    color: var(--mut);
+    font-size: 13px;
+    max-width: 240px;
+}
+
+.foot-cols {
+    display: flex;
+    gap: 60px;
+    flex-wrap: wrap;
+}
+
+.foot-col h4 {
+    font-size: 11.5px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--mut);
+    margin-bottom: 14px;
+}
+
+.foot-col a {
+    display: block;
+    font-size: 13.5px;
+    color: var(--pri);
+    text-decoration: none;
+    margin-bottom: 10px;
+    transition: color .15s;
+}
+.foot-col a:hover { color: var(--acc); }
+
+.foot-bottom {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 0 6vw 40px;
+    color: var(--mut);
+    font-size: 12px;
+}
+
+/* ── Content pages (chi-siamo, articoli) shared basics ── */
+.content-page {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 90px 6vw 100px;
+}
+
+.content-page h1 {
+    font-size: clamp(32px, 5vw, 46px);
+    font-weight: 800;
+    letter-spacing: -1px;
+    line-height: 1.15;
+    margin-bottom: 20px;
+}
+
+.content-page .lede {
+    font-size: 17px;
+    color: var(--mut);
+    margin-bottom: 40px;
+}
+
+.content-page h2 {
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: -.5px;
+    margin: 40px 0 16px;
+}
+
+.content-page p {
+    font-size: 15.5px;
+    color: #cfd3d9;
+    line-height: 1.8;
+    margin-bottom: 18px;
+}
+
+.content-page ul {
+    margin: 0 0 18px 20px;
+    color: #cfd3d9;
+    font-size: 15.5px;
+    line-height: 1.8;
+}
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--mut);
+    text-decoration: none;
+    margin-bottom: 32px;
+    transition: color .15s;
+}
+.back-link:hover { color: var(--acc); }
+
+/* ── Articoli index ── */
+.articles-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.article-card {
+    display: block;
+    background: var(--card);
+    border: 1px solid var(--b);
+    border-radius: 16px;
+    padding: 28px 24px;
+    text-decoration: none;
+    transition: border-color .15s, transform .15s;
+}
+.article-card:hover {
+    border-color: var(--acc-b);
+    transform: translateY(-2px);
+}
+
+.article-card .eyebrow { margin-bottom: 14px; }
+
+.article-card h3 {
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: -.3px;
+    margin-bottom: 10px;
+    line-height: 1.35;
+}
+
+.article-card p {
+    font-size: 13.5px;
+    color: var(--mut);
+    line-height: 1.6;
+}
+
+@media (max-width: 780px) {
+    .articles-grid { grid-template-columns: 1fr; }
+}
