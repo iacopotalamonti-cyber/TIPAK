@@ -204,6 +204,45 @@ a { color: inherit; }
     margin: 0 auto 46px;
 }
 
+/* ── Glance strip — risponde subito a cos'è / per chi / perché ── */
+.glance {
+    padding-top: 0;
+    border-top: none;
+}
+
+.glance-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+.glance-item {
+    background: var(--card);
+    border: 1px solid var(--b);
+    border-radius: 12px;
+    padding: 20px 18px;
+}
+
+.glance-tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .5px;
+    text-transform: uppercase;
+    color: var(--acc);
+    margin-bottom: 10px;
+}
+
+.glance-item p {
+    font-size: 13.5px;
+    color: var(--mut);
+    line-height: 1.5;
+}
+
+@media (max-width: 720px) {
+    .glance-grid { grid-template-columns: 1fr; }
+}
+
 /* ── Demo mappa ── */
 .demo-sub {
     text-align: center;
