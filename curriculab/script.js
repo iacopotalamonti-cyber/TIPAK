@@ -56,9 +56,18 @@ try {
 async function salvaCandidato(datiUtente) {
     if (!supabaseClient) throw new Error('Supabase non disponibile');
 
+    /* .insert(), non .upsert(): con RLS attiva e nessuna policy di
+       SELECT su questa tabella (voluto: anon deve poter solo scrivere,
+       mai leggere i profili altrui), il percorso ON CONFLICT di upsert()
+       fa fallire ogni richiesta con "new row violates row-level security
+       policy" perché Postgres deve rileggere la riga per risolvere il
+       conflitto — indipendentemente dall'header Prefer/return. Verificato
+       contro l'istanza reale: upsert() → sempre 401/42501, insert() → 201.
+       Non essendoci un vincolo UNIQUE su email, upsert() non stava comunque
+       facendo un vero merge dei duplicati: era già equivalente a insert(). */
     const { data, error } = await supabaseClient
         .from('candidati')
-        .upsert([{
+        .insert([{
             email: datiUtente.email,
             nome: datiUtente.nome,
             cognome: datiUtente.cognome,
