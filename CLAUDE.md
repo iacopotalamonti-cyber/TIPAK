@@ -40,7 +40,7 @@ Single-page, split-view app: left half is a form (`#form-section`), right half i
 
 **PDF export is intentionally not a screenshot/canvas render.** `generaPDF()` calls `buildCVHTML()`, which independently re-reads the same form fields and returns a fully self-contained HTML document (own inline `<style>`, A4 print rules) — this is a separate render path from the live preview, not a serialization of it. The result is opened via a blob URL in a new tab for the user to print-to-PDF (falls back to a file download if the popup is blocked). This keeps the exported PDF's text real/selectable, which is the whole point (readable by ATS parsers like Taleo/SuccessFactors) — do not reintroduce an image-based export (e.g. html2pdf.js/canvas) here, that was deliberately removed.
 
-**Supabase**: `script.js` creates `supabaseClient` at module load with a hardcoded project URL + publishable key. `salvaCandidato()` upserts into a `candidati` table but **is not currently called from anywhere** in the app — treat it as present-but-unwired rather than dead code to delete without checking first.
+**Supabase**: `script.js` creates `supabaseClient` at module load (wrapped in try/catch — if the external Supabase script fails to load, `supabaseClient` stays `null` and callers must degrade gracefully rather than throw). `salvaCandidato()` upserts into a `candidati` table (email/nome/cognome/full `dati_cv` blob) and is called from `generaPDF()` whenever the form has an email filled in. It runs **in parallel with, and must never block or delay**, the PDF download — it's fire-and-forget with its own toast feedback (success vs. "CV scaricato, ma il profilo non è stato salvato su Tipak."). Don't make CV export wait on this network call.
 
 ## Architecture — `aziende/`
 
