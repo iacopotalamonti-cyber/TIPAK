@@ -104,6 +104,13 @@ a { color: inherit; }
     margin-bottom: 24px;
 }
 
+.hero-kicker {
+    font-size: clamp(16px, 2.2vw, 19px);
+    font-weight: 600;
+    color: var(--mut);
+    margin-bottom: 10px;
+}
+
 .hero h1 {
     font-size: clamp(32px, 5.5vw, 52px);
     font-weight: 800;
@@ -575,7 +582,7 @@ a { color: inherit; }
 /* ── Steps ── */
 .steps {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 20px;
 }
 
@@ -607,6 +614,10 @@ a { color: inherit; }
 .step p {
     font-size: 13.5px;
     color: var(--mut);
+}
+
+@media (max-width: 860px) {
+    .steps { grid-template-columns: repeat(2, 1fr); }
 }
 
 @media (max-width: 720px) {
